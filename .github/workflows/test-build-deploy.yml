@@ -26,7 +26,7 @@ jobs:
         run: npm ci
       
       - name: Build Angular
-        run: npm run build -- --configuration=production --base-href=/Bommer69/
+        run: npm run build -- --configuration=production --base-href=/kiemthu-cicd-/
       
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
