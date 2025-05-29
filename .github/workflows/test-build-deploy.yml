@@ -32,16 +32,13 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist/kiemthu-cicd
-      - name: Install Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
           
       - name: Run tests
-        run: npm test  
-        # Chạy kiểm thử (định nghĩa trong package.json)
+        run: npm test -- --watchAll=false
+        
       - name: Build project
         run: npm run build
+    
     
 
   deploy:
