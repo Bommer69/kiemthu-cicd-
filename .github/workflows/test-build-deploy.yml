@@ -34,7 +34,10 @@ jobs:
           path: ./dist/kiemthu-cicd
           
       - name: Run tests
-        run: npm test        # Chạy kiểm thử (định nghĩa trong package.json)
+        run: npm test  
+        # Chạy kiểm thử (định nghĩa trong package.json)
+      - name: Build project
+        run: npm run build
     
 
   deploy:
