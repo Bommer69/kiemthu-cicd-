@@ -1,53 +1,52 @@
-name: Deploy Angular to GitHub Pages
+name: Node.js CI/CD Pipeline
 
 on:
   push:
-    branches: ["main"]  # Update to your default branch
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    branches: [ "main" ]  # Kích hoạt khi push vào nhánh main
+  pull_request:
+    branches: [ "main" ]  # Kích hoạt khi có pull request vào main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest  # Chạy trên máy ảo Ubuntu
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4  # Lấy mã nguồn từ repository
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
-      - name: Install Dependencies
-        run: npm ci
-      
-      - name: Build Angular
-        run: npm run build -- --configuration=production --base-href=/kiemthu-cicd-/
-      
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist/kiemthu-cicd
-          
+          node-version: '20'  # Sử dụng Node.js phiên bản 20
+
+      - name: Install dependencies
+        run: npm install      # Cài đặt dependencies
+
       - name: Run tests
-        run: npm test -- --watchAll=false
-        
-      - name: Build project
-        run: npm run build
-    
-    
+        run: npm test        # Chạy kiểm thử (định nghĩa trong package.json)
 
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    needs: test  # Chỉ chạy sau khi job test thành công
     runs-on: ubuntu-latest
-    needs: build
+    if: github.ref == 'refs/heads/main'  # Chỉ deploy khi push vào main
+
     steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --production  # Chỉ cài dependencies production
+
+      - name: Deploy to Heroku (Ví dụ)
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}  # Khóa API lưu trong Secrets
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          npm install -g heroku
+          heroku login --api-key $HEROKU_API_KEY
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main
